@@ -22,6 +22,7 @@ local trace_id = "0000000000000001"
 local trace_id_32 = "00000000000000000000000000000001"
 local parent_id = "0000000000000002"
 local span_id = "0000000000000003"
+local trace_flags = "04"
 local non_hex_id = "vvvvvvvvvvvvvvvv"
 local too_short_id = "123"
 local too_long_id = "1234567890123456789012345678901234567890" -- 40 digits
@@ -31,6 +32,24 @@ describe("tracing_headers.parse", function()
   _G.kong = {
     log = {},
   }
+
+  describe("jaeger single header parsing", function()
+    local warn
+    before_each(function()
+      warn = spy.on(kong.log, "warn")
+    end)
+
+    after_each(function()
+      kong.log.warn:revert()
+    end)
+
+    it("4 fields", function()
+      local jaeger = fmt("%s:%s:%s:%s", trace_id, span_id, parent_id, trace_flags)
+      local t = { parse({ ["uber-trace-id"] = jaeger }) }
+      assert.same({ "jaeger", trace_id, span_id, parent_id, false }, to_hex_ids(t))
+      assert.spy(warn).not_called()
+    end)
+  end)
 
   describe("b3 single header parsing", function()
     local warn
