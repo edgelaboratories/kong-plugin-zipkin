@@ -33,40 +33,6 @@ describe("tracing_headers.parse", function()
     log = {},
   }
 
-  describe("jaeger single header parsing", function()
-    local warn
-    before_each(function()
-      warn = spy.on(kong.log, "warn")
-    end)
-
-    after_each(function()
-      kong.log.warn:revert()
-    end)
-
-    it("4 fields", function()
-      local jaeger = fmt("%s:%s:%s:%s", trace_id, span_id, parent_id, trace_flags)
-      local t = { parse({ ["uber-trace-id"] = jaeger }) }
-      assert.same({ "jaeger", trace_id, span_id, parent_id, false }, to_hex_ids(t))
-      assert.spy(warn).not_called()
-    end)
-
-    it("32-digit trace_id", function()
-      local jaeger = fmt("%s:%s:%s:%s", trace_id_32, span_id, parent_id, trace_flags)
-      local t = { parse({ ["uber-trace-id"] = jaeger }) }
-      assert.same({ "jaeger", trace_id_32, span_id, parent_id, false }, to_hex_ids(t))
-      assert.spy(warn).not_called()
-    end)
-
-    describe("errors", function()
-      it("requires trace_id", function()
-        local jaeger = ""
-        local t = { parse({ ["uber-trace-id"] = jaeger }) }
-        assert.same({ "jaeger" }, t)
-        assert.spy(warn).called_with("invalid jaeger uber-trace-id header; ignoring.")
-      end)
-    end)
-  end)
-
   describe("b3 single header parsing", function()
     local warn
     before_each(function()
@@ -706,4 +672,3 @@ describe("tracing_headers.set", function()
     end)
   end)
 end)
-
