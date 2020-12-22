@@ -11,10 +11,7 @@ local ZipkinLogHandler = {
   VERSION = "1.2.0",
   -- We want to run first so that timestamps taken are at start of the phase
   -- also so that other plugins might be able to use our structures
-  -- PRIORITY = 100000,
-
-  -- We want to run *AFTER* request-transformer/response-transformer
-  PRIORITY = 799
+  PRIORITY = 100000,
 }
 
 local reporter_cache = setmetatable({}, { __mode = "k" })
