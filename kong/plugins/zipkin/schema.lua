@@ -58,7 +58,8 @@ return {
           { default_header_type = { type = "string", required = true, default = "b3",
                                     one_of = { "b3", "b3-single", "w3c" } } },
           { static_tags = { type = "array", elements = static_tag,
-                            custom_validator = validate_static_tags } }
+                            custom_validator = validate_static_tags } },
+          { only_trusted_ips = { type = "boolean", default = false } },
         },
     }, },
   },

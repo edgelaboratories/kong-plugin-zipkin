@@ -3,6 +3,7 @@ local new_span = require "kong.plugins.zipkin.span".new
 local utils = require "kong.tools.utils"
 local tracing_headers = require "kong.plugins.zipkin.tracing_headers"
 
+local kong = kong
 local subsystem = ngx.config.subsystem
 local fmt = string.format
 local rand_bytes = utils.get_rand_bytes
@@ -102,8 +103,13 @@ if subsystem == "http" then
   initialize_request = function(conf, ctx)
     local req = kong.request
 
-    local header_type, trace_id, span_id, parent_id, should_sample, baggage =
-      tracing_headers.parse(req.get_headers())
+    local header_type, trace_id, span_id, parent_id, should_sample, baggage = { nil, nil, nil, nil, nil, nil }
+
+    -- only trusted IPs should be considered to consume the traces.
+    if ( not conf.only_trusted_ips or kong.ip.is_trusted(kong.client.get_ip()) ) then
+      header_type, trace_id, span_id, parent_id, should_sample, baggage =
+        tracing_headers.parse(req.get_headers())
+    end
     local method = req.get_method()
 
     if should_sample == nil then
