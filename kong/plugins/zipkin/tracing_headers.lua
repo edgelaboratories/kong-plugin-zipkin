@@ -338,6 +338,7 @@ local function set(conf_header_type, found_header_type, proxy_span, conf_default
 
   if conf_header_type ~= "preserve" and
      found_header_type ~= nil and
+     conf_header_type ~= "ignore" and
      conf_header_type ~= found_header_type
   then
     kong.log.warn("Mismatched header types. conf: " .. conf_header_type .. ". found: " .. found_header_type)

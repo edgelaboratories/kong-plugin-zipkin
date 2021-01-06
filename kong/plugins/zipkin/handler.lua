@@ -102,8 +102,13 @@ if subsystem == "http" then
   initialize_request = function(conf, ctx)
     local req = kong.request
 
-    local header_type, trace_id, span_id, parent_id, should_sample, baggage =
-      tracing_headers.parse(req.get_headers())
+    local header_type = conf.default_header_type
+    local trace_id, span_id, parent_id, should_sample, baggage
+    if conf.header_type ~= "ignore" then
+      header_type, trace_id, span_id, parent_id, should_sample, baggage =
+        tracing_headers.parse(req.get_headers())
+    end
+
     local method = req.get_method()
 
     if should_sample == nil then
@@ -113,6 +118,8 @@ if subsystem == "http" then
     if trace_id == nil then
       trace_id = rand_bytes(conf.traceid_byte_count)
     end
+
+    kong.log.warn("trace " .. trace_id .. ":" .. header_type .. ":" .. tostring(should_sample))
 
     local request_span = new_span(
       "SERVER",
