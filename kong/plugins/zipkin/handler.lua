@@ -119,8 +119,6 @@ if subsystem == "http" then
       trace_id = rand_bytes(conf.traceid_byte_count)
     end
 
-    kong.log.warn("trace " .. trace_id .. ":" .. header_type .. ":" .. tostring(should_sample))
-
     local request_span = new_span(
       "SERVER",
       method,
